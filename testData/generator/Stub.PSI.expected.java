@@ -51,6 +51,9 @@ import test.stub.Element1Stub;
 
 public interface Element1 extends PsiElement, StubBasedPsiElement<Element1Stub> {
 
+  @NotNull
+  Element5 getElement5();
+
 }
 // ---- Element2.java -----------------
 //header.txt
@@ -63,6 +66,9 @@ import com.intellij.psi.StubBasedPsiElement;
 import test.stub.Element2Stub;
 
 public interface Element2 extends PsiElement, StubBasedPsiElement<Element2Stub> {
+
+  @NotNull
+  List<Element4> getElement4List();
 
 }
 // ---- Element3.java -----------------
@@ -77,6 +83,9 @@ import test.stub.Element3Stub;
 
 public interface Element3 extends PsiElement, StubBasedPsiElement<Element3Stub> {
 
+  @NotNull
+  Element4 getElement4();
+
 }
 // ---- Element4.java -----------------
 //header.txt
@@ -89,6 +98,9 @@ import com.intellij.psi.StubBasedPsiElement;
 import test.stub.Element4Stub;
 
 public interface Element4 extends PsiElement, StubBasedPsiElement<Element4Stub> {
+
+  @Nullable
+  Element2 getElement2();
 
 }
 // ---- Element5.java -----------------
@@ -132,6 +144,12 @@ public class Element1Impl extends MyStubbedElementBase<Element1Stub> implements 
     else super.accept(visitor);
   }
 
+  @Override
+  @NotNull
+  public Element5 getElement5() {
+    return findNotNullChildByClass(Element5.class);
+  }
+
 }
 // ---- Element2Impl.java -----------------
 //header.txt
@@ -161,6 +179,12 @@ public class Element2Impl extends MyStubbedElementBase<Element2Stub> implements 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof Visitor) ((Visitor)visitor).visitElement2(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public List<Element4> getElement4List() {
+    return findChildrenByClass(Element4.class, test.stub.Element4Stub.class);
   }
 
 }
@@ -193,6 +217,12 @@ public class Element3Impl extends MySubstituted implements Element3 {
     else super.accept(visitor);
   }
 
+  @Override
+  @NotNull
+  public Element4 getElement4() {
+    return findNotNullChildByClass(Element4.class, test.stub.Element4Stub.class);
+  }
+
 }
 // ---- Element4Impl.java -----------------
 //header.txt
@@ -223,6 +253,12 @@ public class Element4Impl extends StubBasedPsiElementBase<Element4Stub> implemen
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof Visitor) ((Visitor)visitor).visitElement4(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @Nullable
+  public Element2 getElement2() {
+    return findChildByClass(Element2.class, test.stub.Element2Stub.class);
   }
 
 }
