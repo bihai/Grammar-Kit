@@ -15,6 +15,9 @@ public interface FooTypes {
   IElementType ELEMENT_3 = FooParserDefinition.createType("ELEMENT_3");
   IElementType ELEMENT_4 = FooParserDefinition.createType("ELEMENT_4");
   IElementType ELEMENT_5 = FooParserDefinition.createType("ELEMENT_5");
+  IElementType INTERFACE_TYPE = FooParserDefinition.createType("INTERFACE_TYPE");
+  IElementType STRUCT_TYPE = FooParserDefinition.createType("STRUCT_TYPE");
+  IElementType TYPE = FooParserDefinition.createType("TYPE");
 
 
   class Factory {
@@ -34,6 +37,15 @@ public interface FooTypes {
       }
       else if (type == ELEMENT_5) {
         return new Element5Impl(node);
+      }
+      else if (type == INTERFACE_TYPE) {
+        return new InterfaceTypeImpl(node);
+      }
+      else if (type == STRUCT_TYPE) {
+        return new StructTypeImpl(node);
+      }
+      else if (type == TYPE) {
+        return new TypeImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }
@@ -112,6 +124,41 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
 public interface Element5 extends PsiElement {
+
+}
+// ---- InterfaceType.java -----------------
+//header.txt
+package test.psi;
+
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
+
+public interface InterfaceType extends Type {
+
+}
+// ---- StructType.java -----------------
+//header.txt
+package test.psi;
+
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
+
+public interface StructType extends Type {
+
+}
+// ---- Type.java -----------------
+//header.txt
+package test.psi;
+
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.StubBasedPsiElement;
+import test.stub.TypeStub;
+
+public interface Type extends PsiElement, StubBasedPsiElement<TypeStub> {
 
 }
 // ---- Element1Impl.java -----------------
@@ -288,6 +335,97 @@ public class Element5Impl extends ASTWrapperPsiElement implements Element5 {
   }
 
 }
+// ---- InterfaceTypeImpl.java -----------------
+//header.txt
+package test.psi.impl;
+
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static test.FooTypes.*;
+import test.psi.*;
+import com.intellij.psi.stubs.IStubElementType;
+
+public class InterfaceTypeImpl extends TypeImpl implements InterfaceType {
+
+  public InterfaceTypeImpl(ASTNode node) {
+    super(node);
+  }
+
+  public InterfaceTypeImpl(test.stub.TypeStub stub, IStubElementType nodeType) {
+    super(stub, nodeType);
+  }
+
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof Visitor) ((Visitor)visitor).visitInterfaceType(this);
+    else super.accept(visitor);
+  }
+
+}
+// ---- StructTypeImpl.java -----------------
+//header.txt
+package test.psi.impl;
+
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static test.FooTypes.*;
+import test.psi.*;
+import com.intellij.psi.stubs.IStubElementType;
+
+public class StructTypeImpl extends TypeImpl implements StructType {
+
+  public StructTypeImpl(ASTNode node) {
+    super(node);
+  }
+
+  public StructTypeImpl(test.stub.TypeStub stub, IStubElementType nodeType) {
+    super(stub, nodeType);
+  }
+
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof Visitor) ((Visitor)visitor).visitStructType(this);
+    else super.accept(visitor);
+  }
+
+}
+// ---- TypeImpl.java -----------------
+//header.txt
+package test.psi.impl;
+
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static test.FooTypes.*;
+import test.stub.TypeStub;
+import test.psi.*;
+import com.intellij.psi.stubs.IStubElementType;
+
+public class TypeImpl extends MyStubbedElementBase<TypeStub> implements Type {
+
+  public TypeImpl(ASTNode node) {
+    super(node);
+  }
+
+  public TypeImpl(TypeStub stub, IStubElementType nodeType) {
+    super(stub, nodeType);
+  }
+
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof Visitor) ((Visitor)visitor).visitType(this);
+    else super.accept(visitor);
+  }
+
+}
 // ---- Visitor.java -----------------
 //header.txt
 package test.psi;
@@ -315,6 +453,18 @@ public class Visitor extends PsiElementVisitor {
   }
 
   public void visitElement5(@NotNull Element5 o) {
+    visitPsiElement(o);
+  }
+
+  public void visitInterfaceType(@NotNull InterfaceType o) {
+    visitType(o);
+  }
+
+  public void visitStructType(@NotNull StructType o) {
+    visitType(o);
+  }
+
+  public void visitType(@NotNull Type o) {
     visitPsiElement(o);
   }
 

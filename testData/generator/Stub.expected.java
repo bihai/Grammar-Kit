@@ -21,7 +21,7 @@ public class FooParser implements PsiParser {
 
   public void parseLight(IElementType root_, PsiBuilder builder_) {
     boolean result_;
-    builder_ = adapt_builder_(root_, builder_, this, null);
+    builder_ = adapt_builder_(root_, builder_, this, EXTENDS_SETS_);
     Marker marker_ = enter_section_(builder_, 0, _COLLAPSE_, null);
     if (root_ == ELEMENT_1) {
       result_ = element1(builder_, 0);
@@ -38,6 +38,15 @@ public class FooParser implements PsiParser {
     else if (root_ == ELEMENT_5) {
       result_ = element5(builder_, 0);
     }
+    else if (root_ == INTERFACE_TYPE) {
+      result_ = interface_type(builder_, 0);
+    }
+    else if (root_ == STRUCT_TYPE) {
+      result_ = struct_type(builder_, 0);
+    }
+    else if (root_ == TYPE) {
+      result_ = type(builder_, 0);
+    }
     else {
       result_ = parse_root_(root_, builder_, 0);
     }
@@ -47,6 +56,10 @@ public class FooParser implements PsiParser {
   protected boolean parse_root_(IElementType root_, PsiBuilder builder_, int level_) {
     return root(builder_, level_ + 1);
   }
+
+  public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
+    create_token_set_(INTERFACE_TYPE, STRUCT_TYPE, TYPE),
+  };
 
   /* ********************************************************** */
   // 'aa' element5
@@ -120,7 +133,18 @@ public class FooParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // element1 | element2 | element3 | element4 | element5
+  // 'interface'
+  public static boolean interface_type(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "interface_type")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _NONE_, "<interface type>");
+    result_ = consumeToken(builder_, "interface");
+    exit_section_(builder_, level_, marker_, INTERFACE_TYPE, result_, false, null);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // element1 | element2 | element3 | element4 | element5 | type
   static boolean root(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "root")) return false;
     boolean result_;
@@ -130,7 +154,31 @@ public class FooParser implements PsiParser {
     if (!result_) result_ = element3(builder_, level_ + 1);
     if (!result_) result_ = element4(builder_, level_ + 1);
     if (!result_) result_ = element5(builder_, level_ + 1);
+    if (!result_) result_ = type(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // 'struct'
+  public static boolean struct_type(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "struct_type")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _NONE_, "<struct type>");
+    result_ = consumeToken(builder_, "struct");
+    exit_section_(builder_, level_, marker_, STRUCT_TYPE, result_, false, null);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // interface_type | struct_type
+  public static boolean type(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "type")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _COLLAPSE_, "<type>");
+    result_ = interface_type(builder_, level_ + 1);
+    if (!result_) result_ = struct_type(builder_, level_ + 1);
+    exit_section_(builder_, level_, marker_, TYPE, result_, false, null);
     return result_;
   }
 

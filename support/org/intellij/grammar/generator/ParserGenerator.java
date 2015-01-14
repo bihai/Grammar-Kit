@@ -1299,6 +1299,20 @@ public class ParserGenerator {
                       implSuper.indexOf("<") < implSuper.indexOf(">") &&
                       !javaHelper.findClassMethods(implSuper.substring(0, implSuper.indexOf("<")), false, "StubBasedPsiElementBase", 2).isEmpty()
                       ? implSuper.substring(implSuper.indexOf("<") + 1, implSuper.indexOf(">")) : null;
+    
+    if (stubName == null) {
+      String extendName = getAttribute(rule, KnownAttribute.EXTENDS);
+      if (extendName != null) {
+        BnfRule extendsRule = myFile.getRule(extendName);
+        if (extendsRule != null) {
+          String parentStubClass = getAttribute(extendsRule, KnownAttribute.STUB_CLASS);
+          if (StringUtil.isNotEmpty(parentStubClass)) {
+            stubName = parentStubClass;
+          }
+        }
+      }
+    }
+    
     if (stubName != null) imports.add(BnfConstants.ISTUBELEMENTTYPE_CLASS);
 
     generateClassHeader(psiClass, imports, "", false, implSuper, superInterface);
